@@ -12,7 +12,7 @@ Model name is converted to lowercase for the collection name:
 """
 
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, Literal
 
 # Example schemas (replace with your own):
 
@@ -41,8 +41,27 @@ class Product(BaseModel):
 # Add your own schemas here:
 # --------------------------------------------------
 
-# Note: The Flames database viewer will automatically:
-# 1. Read these schemas from GET /schema endpoint
-# 2. Use them for document validation when creating/editing
-# 3. Handle all database operations (CRUD) directly
-# 4. You don't need to create any database endpoints!
+CategoryType = Literal[
+    "Structural",
+    "Civil",
+    "Geotechnical",
+    "New Enquiry",
+    "Other",
+]
+
+class CallLog(BaseModel):
+    """
+    Caller records from AI receptionist
+    Collection name: "calllog"
+    """
+    caller_name: Optional[str] = Field(None, description="Name of the caller, if provided")
+    phone: Optional[str] = Field(None, description="Phone number")
+    email: Optional[str] = Field(None, description="Email address if provided")
+    company: Optional[str] = Field(None, description="Company or organization")
+    category: CategoryType = Field(..., description="Call category")
+    subject: Optional[str] = Field(None, description="Short subject or title")
+    message: Optional[str] = Field(None, description="Transcribed message or notes")
+    source: str = Field("ai-receptionist", description="Source system that created the log")
+    assigned_to: Optional[str] = Field(None, description="Engineer or team assigned")
+    priority: Optional[Literal["low", "medium", "high"]] = Field("medium", description="Priority flag")
+    status: Optional[Literal["new", "in_progress", "closed"]] = Field("new", description="Workflow status")
